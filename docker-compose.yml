@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  php:
+    build:
+      context: .docker/php
+    container_name: php_app
+    volumes:
+      - ./api:/var/www/html
+    networks:
+      - app-network
+
+  nginx:
+    build:
+      context: .docker/nginx
+    container_name: nginx_app
+    volumes:
+      - ./api:/var/www/html
+    ports:
+      - "8080:80"
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql:8
+    container_name: mysql_app
+    tty: true
+    volumes:
+      - ./.mysql:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=office_app
+      - MYSQL_ROOT_PASSWORD=password
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+  
+  redis:
+    image: redis:6.2
+    container_name: redis_vt
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
